@@ -162,17 +162,7 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
                 if rigid_mols:
                     sim.add_custom('run 0')
                     sim.add(lmps.Velocity(style='scale'))
-
-                sim.add_md(lmps.MolecularDynamics(name='main_fix_{}'.format(it),
-                                                  group=nonrig_group_name if rigid_mols else 'all',
-                                                  ensemble='npt',
-                                                  timestep=t,
-                                                  temperature=mdp.get('temp'),
-                                                  pressure=mdp.get('pressure'),
-                                                  run=False,
-                                                  extra_keywords={'dilate': 'all'} if rigid_mols else {}))
-
-                # create the second NVT fix for rigid molecules that cannot be put in NPT fix
+                # create the NVT fix for rigid molecules that cannot be put in NPT fix
                 if rigid_mols:
                     sim.add(lmps.MolecularDynamics(name='rig_fix_{}'.format(it),
                                                    ensemble='rigid/nvt/small molecule',
@@ -182,6 +172,15 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
                                                    temperature=mdp.get('temp'),
                                                    pressure=mdp.get('pressure'),
                                                    run=False))
+                sim.add_md(lmps.MolecularDynamics(name='main_fix_{}'.format(it),
+                                                  group=nonrig_group_name if rigid_mols else 'all',
+                                                  ensemble='npt',
+                                                  timestep=t,
+                                                  temperature=mdp.get('temp'),
+                                                  pressure=mdp.get('pressure'),
+                                                  run=False,
+                                                  extra_keywords={'dilate': 'all'} if rigid_mols else {}))
+                
                 sim.add_custom('fix        tether_fix_{} matrix spring tether 30.0 0.0 0.0 0.0 0.0'.format(it))
 
                 sim.add_custom('run {:}\n'.format(lng))
@@ -190,16 +189,7 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
                 sim.add_custom('unfix tether_fix_{:}'.format(it))
 
         else:
-            sim.add_md(lmps.MolecularDynamics(name='main_fix',
-                                              group=nonrig_group_name if rigid_mols else 'all',
-                                              ensemble='npt',
-                                              timestep=mdp.get('timestep'),
-                                              temperature=mdp.get('temp'),
-                                              pressure=mdp.get('pressure'),
-                                              run=False,
-                                              extra_keywords={'dilate': 'all'} if rigid_mols else {}))
-
-            # create the second NVT fix for rigid molecules that cannot be put in NPT fix
+            # create the NVT fix for rigid molecules that cannot be put in NPT fix
             if rigid_mols:
                 sim.add(lmps.MolecularDynamics(name='rig_fix',
                                                ensemble='rigid/nvt/small molecule',
@@ -209,6 +199,14 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
                                                temperature=mdp.get('temp'),
                                                pressure=mdp.get('pressure'),
                                                run=False))
+            sim.add_md(lmps.MolecularDynamics(name='main_fix',
+                                              group=nonrig_group_name if rigid_mols else 'all',
+                                              ensemble='npt',
+                                              timestep=mdp.get('timestep'),
+                                              temperature=mdp.get('temp'),
+                                              pressure=mdp.get('pressure'),
+                                              run=False,
+                                              extra_keywords={'dilate': 'all'} if rigid_mols else {}))
 
             # add the "spring tether" fix to the geometrical center of the system to avoid system creep
             sim.add_custom('fix tether_fix matrix spring tether 30.0 0.0 0.0 0.0 0.0')
