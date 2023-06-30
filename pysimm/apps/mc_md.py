@@ -6,7 +6,7 @@ import glob
 import types
 
 
-def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
+def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, np=None, prefix=None, **kwargs):
     """pysimm.apps.mc_md
 
     Performs the iterative hybrid Monte-Carlo/Molecular Dynamics (MC/MD) simulations using :class:`~pysimm.lmps` for
@@ -15,7 +15,11 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
     Args:
         gas_sst (list of :class:`~pysimm.system.System`) : list items describe a different molecule to be
             inserted by MC
-        fixed_sst (:class:`~pysimm.system.System`) : fixed during th MC steps group of atoms (default: None)
+        fixed_sst (:class:`~pysimm.system.System`) : fixed during the MC steps group of atoms (default: None)
+        WARNING: FOLLOWING NOT IN STABLE RELEASE; implemented by Brandon Tapia (bctapia@mit.edu; btapia@vt.edu; btapia1018@gmail.com)
+        np : number of threads for LAMMPS simulations (default: None)
+        prefix : prefix to call MPI version of LAMMPS (default: None if np=None, mpiexec if np!=None)
+
 
 
     Keyword Args:
@@ -216,7 +220,14 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, **kwargs):
             sim.add_custom('run {:}\n'.format(mdp.get('length')))
 
         # The input for correct simulations is set, starting LAMMPS:
-        sim.run(prefix=[''])
+        if np == None:
+            print('[INFO]: np not specified, defaulting to serial')
+            sim.run(prefix='[]')
+        else:
+            if prefix == None:
+                print('[INFO]: Prefix not specified, defaulting to mpiexec')
+                prefix = 'mpiexec'
+            sim.run(np=np, prefix=prefix)
         os.environ['OMP_NUM_THREADS'] = nm_treads
 
         # Updating the size of the fixed system from the MD simulations and saving the coordinates for the next MC
