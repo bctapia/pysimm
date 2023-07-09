@@ -12,15 +12,15 @@ def run(test=False):
     '''
 
     # Gas names as they will be referred through simulations
-    gas_names = ['c3h6']
+    gas_names = ['ch4']
 
     # Chemical potentials to sample at
-    chem_pot_inp = numpy.arange(-50,-33,0.5) # make sure to input negative numbers; # could also use numpy.linspace() or numpy.arange() if you import numpy
+    chem_pot_inp = numpy.arange(-45,-25,1) # make sure to input negative numbers; # could also use numpy.linspace() or numpy.arange() if you import numpy
 
     chem_pots = [lambda x: x] # don't edit this line
 
     # Subdirectory for insertable gas data
-    data_dir = osp.join('.', 'gases')
+    data_dir = osp.join('..', '09_cassandra_simulations', 'gcmc')
 
     # Setup of gas to be inserted
     gases = []
@@ -29,7 +29,7 @@ def run(test=False):
         gases[-1].forcefield = 'trappe/amber'
 
     # Setup of fixed gas system
-    frame = system.read_lammps('c3h6_system.lmps')
+    frame = system.read_lammps('ch4_system.lmps')
     frame.forcefield = 'trappe/amber'
 
     # Setup of the GCMC simulations
