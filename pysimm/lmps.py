@@ -8,6 +8,7 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2016 Michael E. Fortunato, Coray M. Colina
+# Modified by Brandon C. Tapia (bctapia@mit.edu; btapia@vt.edu; btapia1018@gmail.com)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -130,6 +131,7 @@ FF_SETTINGS = {
             'dihedral_style':   'fourier',
             'improper_style':   'cvff',
             'pair_modify':      {
+                'shift': 'no',
                 'mix': 'arithmetic'
             },
             'special_bonds':    'amber'
