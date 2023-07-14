@@ -142,7 +142,7 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, np=None, prefix
                           pair_modify=mdp.get('pair_modify')))
 
         # custom definitions for the neighbour list updates
-        sim.add_custom('neighbor 2.0 bin \nneigh_modify delay 0 every 1 check yesnrun_style verlet')
+        sim.add_custom('neighbor 2.0 bin \nneigh_modify delay 0 every 1 check yes \nrun_style verlet')
 
         # adding group definitions to separate rigid and non-rigid bodies
         sim.add(lmps.Group('matrix', 'id', css.run_queue[0].group_by_id('matrix')[0]))
