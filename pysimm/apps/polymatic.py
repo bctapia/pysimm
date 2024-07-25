@@ -16,7 +16,7 @@ except ImportError:
     rappture = False
 
 
-def pack(script, file_in, nrep, boxl, file_out):
+def pack(script, file_in, nrep, boxl, file_out='data.lmps'):
     """pysimm.apps.polymatic.pack
 
     Calls Polymatic random packing code
@@ -98,7 +98,13 @@ def run(settings):
         Rappture.Utils.progress(0, 'Initializing Polymatic...')
     bonds = 0
 
-    os.mkdir('logs')
+
+    try:
+        os.mkdir('logs') # edit to delete rewrite directory if it already exists
+    except FileExistsError:
+        print('Rewriting logs directory')
+        shutil.rmtree('logs')
+        os.mkdir('logs')
 
     polymatic(os.path.join(settings.polymatic_dir, 'polym_init.pl'),
               'data.lmps',
