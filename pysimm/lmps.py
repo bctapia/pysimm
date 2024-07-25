@@ -38,6 +38,7 @@ import sys
 import json
 from random import randint
 from time import strftime
+from time import sleep
 from io import StringIO
 
 try:
@@ -1043,9 +1044,16 @@ def call_lammps(simulation, np, nanohub, prefix='mpiexec'):
             if simulation.print_to_screen:
                 print(stdo.decode('utf-8'))
                 print(stde.decode('utf-8'))
-                    
-    simulation.system.read_lammps_dump('pysimm.dump.tmp')
 
+    for attempt in range(10):
+        try:
+            simulation.system.read_lammps_dump('pysimm.dump.tmp')
+            break
+        except FileNotFoundError:
+            print("pysimm.dump.tmp not found. Attempt %d/10" % (attempt+1))
+
+        sleep(5)
+        
     try:
         os.remove('temp.lmps')
     except OSError as e:
