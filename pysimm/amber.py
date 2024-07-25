@@ -80,15 +80,15 @@ def calc_charges(s, charge_method='bcc', cleanup=True):
     cl = '{} -fi pdb -i pysimm.tmp.pdb -fo ac -o pysimm.tmp.ac -c {}'.format(ANTECHAMBER_EXEC, charge_method)
     p = Popen(cl.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
     p.communicate()
-    with file('pysimm.tmp.ac') as f:
-        f.next()
-        f.next()
-        line = f.next()
+    with open('pysimm.tmp.ac') as f:
+        f.readline()
+        f.readline()
+        line = f.readline()
         while line.split()[0] == 'ATOM':
             tag = int(line.split()[1])
             charge = float(line.split()[-2])
             s.particles[tag].charge = charge
-            line = f.next()
+            line = f.readline()
     if cleanup:
         cleanup_antechamber()
 
@@ -110,20 +110,66 @@ def get_forcefield_types(s, types='gaff', f=None):
     cl = '{} -fi pdb -i pysimm.tmp.pdb -fo ac -o pysimm.tmp.ac -at {}'.format(ANTECHAMBER_EXEC, types)
     p = Popen(cl.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
     p.communicate()
-    with file('pysimm.tmp.ac') as fr:
-        fr.next()
-        fr.next()
-        line = fr.next()
+
+    c5_c6_flag = False
+    warning_pdb_flag = False
+    missing_types = set()
+
+    with open('pysimm.tmp.ac') as fr:
+
+        fr.readline()
+        fr.readline()
+
+        line = fr.readline()
+
         while line.split()[0] == 'ATOM':
             tag = int(line.split()[1])
             type_name = line.split()[-1]
+
             if s.particle_types.get(type_name):
                 s.particles[tag].type = s.particle_types.get(type_name)[0]
             elif f:
                 pt = f.particle_types.get(type_name)
+                if len(pt) == 0:
+                    if type_name not in missing_types:
+                        warning_print(f'Atom type {type_name} was not found in {types}\n')
+                        missing_types.add(type_name)
+
+                if types == 'gaff2' and type_name in ['c5', 'c6']:
+                    if not c5_c6_flag:
+                        warning_print(f'''Reading type as {type_name}, writing type as c3
+    c5/c6 is currently replacing c3 but not yet available
+    Read more at: http://archive.ambermd.org/202307/0021.html\n''')
+                        pt = f.particle_types.get('c3')
+                        c5_c6_flag = True
+
+                elif len(pt) == 0:
+                    if not warning_pdb_flag:
+                        warning_print('writing Missing_Types.pdb. Please analyze and determine potential issues due to missing types\n')
+                        warning_pdb_flag = True
+                    s.write_pdb('Missing_Types.pdb')
+
                 if pt:
                     s.particles[tag].type = s.particle_types.add(pt[0].copy())
-                    
             else:
                 error_print('cannot find type {} in system or forcefield'.format(type_name))
-            line = fr.next()
+            line = fr.readline()
+
+def get_missing_ff_params(ante_result='pysimm.tmp.ac', checker='parmchk2', types='gaff'):
+    """pysimm.amber.get_missing_ff_types
+
+    Uses parmchk or parmchk2 to determine missing forcefield parameters.
+    Defaults to GAFF atom types. 
+
+    Args:
+        ante_result: name of results file from antechamber
+        checker: name of checker (default: parmchk2)
+        types: name of atom types to use (default: gaff)
+
+    Returns:
+        None
+    """
+
+    cl = '{} -i pdb -i {} -f ac -o missing_ff_params.frcmod -s {}'.format(checker, ante_result, types)
+    p = Popen(cl.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p.communicate()
