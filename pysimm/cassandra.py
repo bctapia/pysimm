@@ -1,4 +1,4 @@
-# ******************************************************************************
+ # ******************************************************************************
 # pysimm.cassandra module
 # ******************************************************************************
 #
@@ -34,7 +34,8 @@ import re
 import numpy as np
 import random
 import logging
-from collections import Iterable, OrderedDict
+from collections import OrderedDict
+from collections.abc import Iterable
 from pysimm import system
 from string import ascii_uppercase
 from pydoc import locate

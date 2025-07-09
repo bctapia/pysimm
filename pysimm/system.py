@@ -264,7 +264,7 @@ class ParticleType(Item):
     def parse_lammps(cls, line, style):
         tmp = line.split('#')
         data = tmp.pop(0).strip().split()
-        name = ','.join(re.split(',|\s+', tmp[0].strip())) if tmp else None
+        name = ','.join(re.split(r',|\s+', tmp[0].strip())) if tmp else None
         if style == 'mass':
             if len(data) != 2:
                 raise PysimmError('LAMMPS data improperly formatted for mass info')
@@ -415,7 +415,7 @@ class BondType(Item):
     def parse_lammps(cls, line, style):
         tmp = line.split('#')
         data = tmp.pop(0).strip().split()
-        name = ','.join(re.split(',|\s+', tmp[0].strip())) if tmp else None
+        name = ','.join(re.split(r',|\s+', tmp[0].strip())) if tmp else None
         if style.startswith('harm'):
             if len(data) != 3:
                 raise PysimmError('LAMMPS data improperly formatted for harmonic bond')
@@ -544,7 +544,7 @@ class AngleType(Item):
     def parse_lammps(cls, line, style):
         tmp = line.split('#')
         data = tmp.pop(0).strip().split()
-        name = ','.join(re.split(',|\s+', tmp[0].strip())) if tmp else None
+        name = ','.join(re.split(r',|\s+', tmp[0].strip())) if tmp else None
         if style.startswith('harm'):
             if len(data) != 3:
                 raise PysimmError('LAMMPS data improperly formatted for harmonic angle')
@@ -691,7 +691,7 @@ class DihedralType(Item):
     def parse_lammps(cls, line, style):
         tmp = line.split('#')
         data = tmp.pop(0).strip().split()
-        name = ','.join(re.split(',|\s+', tmp[0].strip())) if tmp else None
+        name = ','.join(re.split(r',|\s+', tmp[0].strip())) if tmp else None
         if style.startswith('harm'):
             if len(data) != 4:
                 raise PysimmError('LAMMPS data improperly formatted for harmonic dihedral')
@@ -915,7 +915,7 @@ class ImproperType(Item):
     def parse_lammps(cls, line, style):
         tmp = line.split('#')
         data = tmp.pop(0).strip().split()
-        name = ','.join(re.split(',|\s+', tmp[0].strip())) if tmp else None
+        name = ','.join(re.split(r',|\s+', tmp[0].strip())) if tmp else None
         if style.startswith('harm') or style.startswith('class2') or style.startswith('umbrella'):
             if len(data) != 3:
                 raise PysimmError('LAMMPS data improperly formatted for harmonic improper')
@@ -4958,7 +4958,7 @@ def read_pdb(pdb_file, str_file=None, **kwargs):
             elem = line[76:78].strip()
             if len(elem) < 1:
                 if len(name) > 0:
-                    elem = re.split('\d+?', name)[0]
+                    elem = re.split(r'\d+?', name)[0]
 
             p = Particle(tag=tag, name=name, resname=resname, chainid=chainid,
                          resid=resid, x=x, y=y, z=z, elem=elem, molecule=1)
