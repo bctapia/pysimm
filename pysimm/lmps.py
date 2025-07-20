@@ -1204,7 +1204,7 @@ class LogFile(object):
                 elif line.startswith('Loop'):
                     copy = False
                     strio.seek(0)
-                    self.data = self.data.append(pd.read_table(strio, sep='\s+', names=names, index_col='Step'))
+                    self.data = self.data.append(pd.read_table(strio, sep=r'\s+', names=names, index_col='Step'))
                 elif copy:
                     strio.write(line)
 

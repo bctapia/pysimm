@@ -47,7 +47,7 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, np=None, prefix
     is_restart = kwargs.get('restart')
     if is_restart:
         for f in glob.glob(lmps_fname.format('*')):
-            l = max(l, int(re.match('\A\d+', os.path.split(f)[1]).group()))
+            l = max(l, int(re.match(r'\A\d+', os.path.split(f)[1]).group()))
 
         to_purge = glob.glob(os.path.join(sim_folder, '{:}.*'.format(l + 1))) + \
                    glob.glob(os.path.join(sim_folder, '{:}.md*'.format(l)))
@@ -220,11 +220,11 @@ def mc_md(gas_sst, fixed_sst=None, mc_props=None, md_props=None, np=None, prefix
             sim.add_custom('run {:}\n'.format(mdp.get('length')))
 
         # The input for correct simulations is set, starting LAMMPS:
-        if np == None:
+        if np is None:
             print('[INFO]: np not specified, defaulting to serial')
             sim.run(prefix='[]')
         else:
-            if prefix == None:
+            if prefix is None:
                 print('[INFO]: Prefix not specified, defaulting to mpiexec')
                 prefix = 'mpiexec'
             sim.run(np=np, prefix=prefix)

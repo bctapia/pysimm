@@ -1,0 +1,36 @@
+'''
+pysimm.apps.md_builder
+'''
+
+import shutil
+
+
+def update_missing_ff_params(lammps_file, parmchk_file = 'missing_ff_params.frcmod'):
+    return
+
+def update_bonds(lammps_file):
+    '''
+    '''
+    try:
+        open(updated_file)
+    except FileNotFoundError:
+        updated_file  = 'updated_'+lammps_file
+        shutil.copy(lammps_file, updated_file)
+
+    with open(updated_file) as f:
+        line = f.readline()
+        while line != '# Pair Coeffs':
+            line = f.readline()
+        line = f.readline()
+        while line.split()[0] != len(0):
+            print(line)
+
+def update_angles(lammps_in):
+    '''
+    '''
+    with open(lammps_in) as f:
+
+def update_dihedrals(lammps_in):
+    '''
+    '''
+    with open(lammps_in) as f:
